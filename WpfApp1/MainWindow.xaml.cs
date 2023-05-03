@@ -1,21 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using IMDbApiLib;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace WpfApp1
 {
@@ -31,36 +21,15 @@ namespace WpfApp1
 
 
 
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        private async void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(SearchTextBox.Text)) return;
-            ResultsListBox.Items.Clear();
-            SearchButton.IsEnabled = false;
-            var worker = new BackgroundWorker();
-            worker.DoWork += (s, args) =>
-            {
-                var searchTerm = args.Argument as string;
-                var results = SearchMovies(searchTerm);
-                args.Result = results;
-            };
-            worker.RunWorkerCompleted += (s, args) =>
-            {
-                var results = args.Result as List<string>;
-                if (results != null)
-                {
-                    foreach (var result in results)
-                    {
-                        ResultsListBox.Items.Add(result);
-                    }
-                }
-                SearchButton.IsEnabled = true;
-              /*  foreach (var result in results)
-                {
-                    ResultsListBox.Items.Add(result);
-                }
-                SearchButton.IsEnabled = true;*/
-            };
-            worker.RunWorkerAsync(SearchTextBox.Text);
+            var api = new ApiLib("k_y76947gh");
+            var result = await api.SearchTitleAsync(SearchTextBox.Text);
+
+            ResultsListBox.ItemsSource = result.Results;
+            ResultsListBox.DisplayMemberPath = "Title";
+            ResultsListBox.SelectedValuePath = "Id";
+
         }
 
         private async Task<List<string>> SearchMovies(string searchTerm)
@@ -82,5 +51,17 @@ namespace WpfApp1
             return results;
         }
 
+        private async void ResultsListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            var api = new ApiLib("k_y76947gh");
+            string id = ResultsListBox.SelectedValue.ToString();
+            var titleData = await api.TitleAsync(id);
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(titleData.Image);
+            bitmap.EndInit();
+            image.Source = bitmap;
+            titleLabel.Content = titleData.FullTitle;
+        }
     }
 }
