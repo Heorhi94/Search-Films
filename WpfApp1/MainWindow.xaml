@@ -17,12 +17,11 @@
             <TextBox x:Name="searchTextBox" Width="200" VerticalAlignment="Center" />
             <Button x:Name="SearchButton" Content="Search" Click="SearchButton_Click" Margin="10,0,10,0" />
             <Button x:Name="stopButton" Content="Stop" Margin="0,0,10,0" Click="stopButton_Click" />
-            <Button x:Name="resumeButton" Content="Resume" Click="resumeButton_Click" />
         </StackPanel>
         <ListBox x:Name="resultsListBox" Grid.Row="1" Margin="10,10,10,10" SelectionChanged="resultsListBox_SelectionChanged" />
         <Label x:Name="titleLabel" Margin="20,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2"/>
         <Image x:Name="image" Grid.Column="1" Grid.Row="1" Margin="10,10,10,10"/>
-        <Label x:Name="infTask" Grid.Column="1" HorizontalAlignment="Left" Margin="10,10,0,0" Grid.Row="2" VerticalAlignment="Top"/>
-        <ProgressBar x:Name="progressBar" Grid.Column="1" HorizontalAlignment="Left" Height="15" Margin="15,45,0,0" Grid.Row="2" VerticalAlignment="Top" Width="152"/>
+        <Label x:Name="infTask" Grid.Column="1" HorizontalAlignment="Left" Margin="81,10,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+        <ProgressBar x:Name="progressBar" Grid.Column="1" HorizontalAlignment="Center" Height="15" Margin="15,35,0,20" Grid.Row="2" VerticalAlignment="Center" Width="152"/>
     </Grid>
 </Window>
