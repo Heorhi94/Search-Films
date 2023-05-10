@@ -1,26 +1,29 @@
 ﻿using IMDbApiLib;
-using Newtonsoft.Json.Linq;
+using MovieSearch;
+using MovieSearch.Components;
+using MovieSearch.Components.AdvancedSearchMVVM.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
+
 
 namespace WpfApp1
 {
-  
+
     public partial class MainWindow : Window
     {
         //k_hye43l7u no
         //k_y76947gh no
         //k_eknpnu11 no
-        //k_lv26p9yv
-        private readonly ApiLib _api = new ApiLib("k_lv26p9yv");
+        //k_lv26p9yv no
+       // k_76o581d7
+        private readonly ApiLib _api = new("k_76o581d7");
         private Task _currentTask;
         private CancellationTokenSource _cancellationTokenSource;
         List<Movie> movies;
@@ -34,14 +37,9 @@ namespace WpfApp1
             InitializeComponent();
         }
 
-
-        private async void searchButton_Click(object sender, RoutedEventArgs e)
+        private async void Search()
         {
-
-            if (movies != null)
-            {
-                movies.Clear();
-            }
+            movies?.Clear();
             try
             {
                 _cancellationTokenSource?.Cancel();
@@ -51,10 +49,10 @@ namespace WpfApp1
                 titleLabel.Content = "";
                 image.Source = null;
                 progressBar.Value = 0;
-
+                
                 var result = await _api.SearchMovieAsync(searchTextBox.Text);
                 movies = result.Results.Select(r => new Movie { Id = r.Id, Title = r.Title, IMG = r.Image }).ToList();
-                downloads = new List<Movie>(); // Инициализация списка downloads
+                downloads = new List<Movie>();
                 resultsListBox.ItemsSource = movies;
                 resultsListBox.DisplayMemberPath = "Title";
                 resultsListBox.SelectedValuePath = "Id";
@@ -69,8 +67,6 @@ namespace WpfApp1
                 MessageBox.Show($"An error occurred: {ex.Message}");
             }
         }
-
-
         private async Task ProcessSearchResultsAsync(CancellationToken cancellationToken)
         {
             var progress = new Progress<int>(value =>
@@ -83,7 +79,7 @@ namespace WpfApp1
             {
                 for (int i = currentMovieIndex; i < movies.Count; i++)
                 {
-                    downloads.Add(movies[i]); // Добавить загруженный ранее элемент в список downloads
+                    downloads.Add(movies[i]);
                     ((IProgress<int>)progress).Report(i + 1);
                     await LoadMovieAsync(downloads[i]);
                     await Task.Delay(1000);
@@ -101,10 +97,6 @@ namespace WpfApp1
                 MessageBox.Show($"An error occurred: {ex.Message}");
             }
         }
-
-
-
-
 
         private async Task LoadMovieAsync(Movie movie)
         {
@@ -126,14 +118,7 @@ namespace WpfApp1
             titleLabel.Content = titleData.FullTitle;
         }
 
-        private void pauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            _cancellationTokenSource.Cancel();
-            MessageBox.Show("Pause loading");
-        }
-
-
-        private async void resultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void SelectItem()
         {
             try
             {
@@ -164,18 +149,7 @@ namespace WpfApp1
             }
         }
 
-        private void continueButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_cancellationTokenSource != null && _cancellationTokenSource.IsCancellationRequested)
-            {
-                _cancellationTokenSource = new CancellationTokenSource();
-                progressBar.Minimum = currentMovieIndex; // Установите минимальное значение progressBar на сохраненной позиции
-                progressBar.Maximum = movies.Count; // Обновите максимальное значение progressBar
-                _currentTask = ProcessSearchResultsAsync(_cancellationTokenSource.Token);
-            }
-        }
-
-        private void stopButton_Click(object sender, RoutedEventArgs e)
+        private void Stop()
         {
             if (_cancellationTokenSource != null && _cancellationTokenSource.Token.CanBeCanceled)
             {
@@ -183,39 +157,50 @@ namespace WpfApp1
             }
             _cancellationTokenSource?.Dispose();
             _cancellationTokenSource = null;
-
-     /*       // Wyczyść listy i zresetuj indeks filmu
-            movies.Clear();
-            downloads.Clear();
-            currentMovieIndex = 0;
-
-            // Wyczyść wyświetlane informacje
-            resultsListBox.ItemsSource = null;
-            titleLabel.Content = "";
-            image.Source = null;
-            progressBar.Value = 0;*/
-
-            // Zresetuj zadanie aktualnego procesu
             _currentTask = null;
 
             MessageBox.Show("Loading stopped");
             infTask.Content = "Searc stopping";
         }
 
+        private  void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+           Search();
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            _cancellationTokenSource.Cancel();
+            MessageBox.Show("Pause loading");
+        }
+
+        private void ResultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SelectItem();
+
+        }
+
+        private void СontinueButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_cancellationTokenSource != null && _cancellationTokenSource.IsCancellationRequested)
+            {
+                _cancellationTokenSource = new CancellationTokenSource();
+                progressBar.Minimum = currentMovieIndex; 
+                progressBar.Maximum = movies.Count;
+                _currentTask = ProcessSearchResultsAsync(_cancellationTokenSource.Token);
+            }
+        }
+
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+           Stop();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            AdvancedSearch advancedSearch = new();
+            advancedSearch.Show();
+        }
     }
-
-
-
-    public class Movie
-
-    {
-        public string Id { get; set; }
-        public string Title { get; set; }
-        public string IMG { get; set; }
-
-        public BitmapImage Image { get; set; }
-
-    }
-
 }
 
