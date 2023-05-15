@@ -12,7 +12,6 @@ namespace MovieSearch.Components.AdvancedSearchMVVM.Models
 {
     public class SearchModel
     {
-        private readonly ApiLib _api = new("k_76o581d7");
         readonly List<string> genres = new()
         {
             "Action",
@@ -168,6 +167,5 @@ namespace MovieSearch.Components.AdvancedSearchMVVM.Models
             }
             return result;
         }
-
     }
 }

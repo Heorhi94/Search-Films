@@ -1,14 +1,12 @@
 ﻿using IMDbApiLib;
 using MovieSearch;
 using MovieSearch.Components;
-using MovieSearch.Components.AdvancedSearchMVVM.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -29,7 +27,7 @@ namespace WpfApp1
         List<Movie> movies;
         List<Movie> downloads;
         private int currentMovieIndex = 0;
-
+        
 
 
         public MainWindow()
@@ -82,7 +80,7 @@ namespace WpfApp1
                     downloads.Add(movies[i]);
                     ((IProgress<int>)progress).Report(i + 1);
                     await LoadMovieAsync(downloads[i]);
-                    await Task.Delay(1000);
+                    await Task.Delay(1000, cancellationToken);
                     currentMovieIndex = i + 1;
                     if (cancellationToken.IsCancellationRequested)
                     {
@@ -160,7 +158,7 @@ namespace WpfApp1
             _currentTask = null;
 
             MessageBox.Show("Loading stopped");
-            infTask.Content = "Searc stopping";
+            infTask.Content = "Search stopped";
         }
 
         private  void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -171,7 +169,7 @@ namespace WpfApp1
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
             _cancellationTokenSource.Cancel();
-            MessageBox.Show("Pause loading");
+            MessageBox.Show("Pause");
         }
 
         private void ResultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -196,10 +194,11 @@ namespace WpfApp1
            Stop();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void AdvancedSearchButton_Click(object sender, RoutedEventArgs e)
         {
             AdvancedSearch advancedSearch = new();
             advancedSearch.Show();
+            
         }
     }
 }

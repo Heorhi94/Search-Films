@@ -1,4 +1,5 @@
 ﻿using IMDbApiLib;
+using IMDbApiLib.Models;
 using MovieSearch.Components.AdvancedSearchMVVM.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -39,8 +40,9 @@ namespace MovieSearch
 
         }
 
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        private  void SearchButton_Click(object sender, RoutedEventArgs e)
         {
+
 
         }
     }
